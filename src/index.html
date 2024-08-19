@@ -1,0 +1,119 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REST Client</title>
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .container {
+    height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  label,
+  input[type="submit"] {
+    margin-top: 20px;
+  }
+</style>
+<body>
+  <div class="container">
+    <h1>Exemplo de SERVIDOR Express</h1>
+    
+    <form id="addForm">
+      <label>Número 1:</label>
+      <input id="num1" type="number" />
+      <label>Número 2:</label>
+      <input id="num2" type="number" />
+      <input type="submit" value="Soma"/>
+    </form>
+    <div class="result">Resultado!</div>
+
+    <form id="subtractForm">
+      <input type="submit" value="Subtrai"/>
+    </form>
+    <div class="subtraction">Resultado!</div>
+
+    <form id="multiplyForm">
+      <input type="submit" value="Multiplica"/>
+    </form>
+    <div class="multiplication">Resultado!</div>
+
+    <form id="divideForm">
+      <input type="submit" value="Divide"/>
+    </form>
+    <div class="division">Resultado!</div>
+  </div>
+  <script>
+    function sendData(url, callback) {
+      const a = document.querySelector("#num1").value;
+      const b = document.querySelector("#num2").value;
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          a: parseInt(a),
+          b: parseInt(b)
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          callback(data);
+        })
+        .catch(err => console.log(err));
+    }
+
+    document.querySelector("#addForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      sendData("/soma", data => {
+        const { result } = data;
+        document.querySelector(".result").innerText = `A Soma é: ${result}`;
+      });
+    });
+
+    document.querySelector("#subtractForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      sendData("/subtrai", data => {
+        const { result } = data;
+        document.querySelector(".subtraction").innerText = `A Subtração é: ${result}`;
+      });
+    });
+
+    document.querySelector("#multiplyForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      sendData("/multiplica", data => {
+        const { result } = data;
+        document.querySelector(".multiplication").innerText = `A Multiplicação é: ${result}`;
+      });
+    });
+
+    document.querySelector("#divideForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      sendData("/divide", data => {
+        if (data.error) {
+          document.querySelector(".division").innerText = `Erro: ${data.error}`;
+        } else {
+          const { result } = data;
+          document.querySelector(".division").innerText = `A Divisão é: ${result}`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
